@@ -1,0 +1,19 @@
+Phần 1 - Phân tích logic lỗi Data Binding
+Dưới đây là nguyên nhân khiến form của bạn Fresher không hoạt động đúng kỳ vọng, dựa trên cơ chế Data Binding của Spring MVC:
+
+Tại sao Tên cửa hàng lại bị null?
+Cơ chế Data Binding của Spring MVC tự động map dữ liệu từ request vào đối tượng (POJO) thông qua việc so khớp chính xác thuộc tính name của thẻ HTML với tên biến (dựa trên Getter/Setter) trong class Java.
+
+Trong file HTML: <input type="text" name="restaurantName" />
+
+Trong class RestaurantProfile: private String name;
+
+Kết luận: Do restaurantName khác với name, Spring không thể tìm thấy phương thức setRestaurantName() tương ứng. Biến name không nhận được dữ liệu nên giữ giá trị mặc định của Object là null.
+
+Tại sao ô checkbox trạng thái active kiểu boolean không hoạt động?
+
+Trong class RestaurantProfile, thuộc tính active được khai báo là kiểu boolean. Spring Data Binder đã được lập trình sẵn để tự động chuyển đổi (parse) một số chuỗi ký tự mặc định từ request sang kiểu boolean (như: "true"/"false", "on"/"off", "yes"/"no", hoặc "1"/"0").
+
+Trong file HTML, bạn Fresher lại code: <input type="checkbox" name="active" value="MỞ_CỬA" />.
+
+Kết luận: Khi chủ quán tích chọn, trình duyệt sẽ gửi giá trị "MỞ_CỬA" về Backend. Spring không biết cách ép kiểu chuỗi tiếng Việt này sang boolean, dẫn đến lỗi TypeMismatchException hoặc tự động fallback (rơi về) giá trị false tùy vào cấu hình.
